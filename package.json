@@ -1,0 +1,20 @@
+{
+    "name": "tap-game-demo",
+    "version": "1.0.0",
+    "description": "Simple Tap Game implementation",
+    "main": "index.html",
+    "scripts": {
+        "start": "node -e \"console.log('Open index.html in browser to play the game')\"",
+        "test": "echo \"Tests should be run in browser environment\" && exit 0"
+    },
+    "engines": {
+        "node": "20"
+    },
+    "keywords": [
+        "game",
+        "tap",
+        "javascript"
+    ],
+    "author": "",
+    "license": "MIT"
+}

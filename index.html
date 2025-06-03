@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Tap Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        }
+
+        .score {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .circle {
+            width: 150px;
+            height: 150px;
+            background-color: #4169E1;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .circle:hover {
+            transform: scale(1.05);
+            background-color: #3155d9;
+        }
+
+        .circle:active {
+            transform: scale(0.95);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border: none;
+            border-radius: 15px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal p {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        .restart-btn {
+            background-color: #4169E1;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background-color: #3155d9;
+        }
+
+        .timer-info {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="score" id="score">0</div>
+        <div class="circle" id="circle">TAP ME!</div>
+        <div class="timer-info" id="timer-info">Click to start game</div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="modal">
+        <div class="modal-content">
+            <h2>Game Over</h2>
+            <p id="finalScore">Your final score: 0</p>
+            <button class="restart-btn" onclick="restartGame()">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0, gameStarted = false, gameTimer = null, gameEnded = false;
+        const scoreElement = document.getElementById('score');
+        const circleElement = document.getElementById('circle');
+        const timerInfoElement = document.getElementById('timer-info');
+        const modalElement = document.getElementById('gameOverModal');
+        const finalScoreElement = document.getElementById('finalScore');
+
+        function updateScore() {
+            score++;
+            scoreElement.textContent = score;
+        }
+
+        function startTimer() {
+            if (gameStarted || gameEnded) return;
+            gameStarted = true;
+            timerInfoElement.textContent = "Game in progress...";
+            gameTimer = setTimeout(() => {
+                endGame();
+            }, 10000);
+        }
+
+        function endGame() {
+            gameEnded = true;
+            finalScoreElement.textContent = `Your final score: ${score}`;
+            modalElement.style.display = 'block';
+            if (gameTimer) {
+                clearTimeout(gameTimer);
+                gameTimer = null;
+            }
+        }
+
+        function restartGame() {
+            score = 0;
+            gameStarted = false;
+            gameEnded = false;
+            scoreElement.textContent = '0';
+            timerInfoElement.textContent = 'Click to start game';
+            modalElement.style.display = 'none';
+            if (gameTimer) {
+                clearTimeout(gameTimer);
+                gameTimer = null;
+            }
+        }
+
+        circleElement.addEventListener('click', function () {
+            if (gameEnded) return;
+            if (!gameStarted) startTimer();
+            updateScore();
+        });
+    </script>
+</body>
+
+</html>

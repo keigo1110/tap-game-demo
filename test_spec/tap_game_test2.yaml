@@ -1,0 +1,83 @@
+id: 20250605-tapgame2-tests
+target_id: 20250605-tapgame2
+cases:
+  - name: 初期表示
+    steps:
+      - ページを読み込む
+    expect:
+      - Player1のスコア表示が "0" になっている
+      - Player2のスコア表示が "0" になっている
+      - 青い円（Player1用）が左側に可視状態
+      - 赤い円（Player2用）が右側に可視状態
+      - プレイヤー名が表示されている
+
+  - name: Player1のスコア増加
+    steps:
+      - Player1の円を 3 回タップ
+    expect:
+      - Player1のスコア表示が "3" になっている
+      - Player2のスコア表示は "0" のまま
+
+  - name: Player2のスコア増加
+    steps:
+      - Player2の円を 2 回タップ
+    expect:
+      - Player2のスコア表示が "2" になっている
+      - Player1のスコア表示は変わらない
+
+  - name: 同時プレイ
+    steps:
+      - Player1の円を 2 回タップ
+      - Player2の円を 3 回タップ
+      - Player1の円を 1 回タップ
+    expect:
+      - Player1のスコア表示が "3" になっている
+      - Player2のスコア表示が "3" になっている
+
+  - name: タイマー開始（Player1スタート）
+    steps:
+      - Player1の円を 1 回タップ（タイマー開始）
+      - 10 秒待つ
+    expect:
+      - "Game Over" モーダルが表示される
+      - Player1とPlayer2の最終スコアが表示される
+      - 勝者または引き分けの結果が表示される
+
+  - name: Player1勝利
+    steps:
+      - Player1の円を 5 回タップ（タイマー開始）
+      - Player2の円を 3 回タップ
+      - 10 秒待つ
+    expect:
+      - "Game Over" モーダルが表示される
+      - "Player 1 Wins!" または類似のメッセージが表示される
+      - Player1: 5, Player2: 3 のスコアが表示される
+
+  - name: Player2勝利
+    steps:
+      - Player1の円を 2 回タップ（タイマー開始）
+      - Player2の円を 4 回タップ
+      - 10 秒待つ
+    expect:
+      - "Game Over" モーダルが表示される
+      - "Player 2 Wins!" または類似のメッセージが表示される
+      - Player1: 2, Player2: 4 のスコアが表示される
+
+  - name: 引き分け
+    steps:
+      - Player1の円を 3 回タップ（タイマー開始）
+      - Player2の円を 3 回タップ
+      - 10 秒待つ
+    expect:
+      - "Game Over" モーダルが表示される
+      - "Draw!" または "It's a tie!" のメッセージが表示される
+      - 両プレイヤーとも同じスコアが表示される
+
+  - name: 再スタート
+    steps:
+      - ゲーム終了後、Game Over モーダルで "Play Again" を押す
+    expect:
+      - Player1のスコア表示が "0" にリセット
+      - Player2のスコア表示が "0" にリセット
+      - 両方の円が再びタップ可能になっている
+      - タイマー未開始状態に戻っている

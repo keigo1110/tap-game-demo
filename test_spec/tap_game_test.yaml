@@ -1,0 +1,30 @@
+id: 20250605-tapgame-tests
+target_id: 20250605-tapgame
+cases:
+  - name: 初期表示
+    steps:
+      - ページを読み込む
+    expect:
+      - スコア表示が "0" になっている
+      - 円要素が可視状態
+
+  - name: スコア増加
+    steps:
+      - 円を 3 回タップ
+    expect:
+      - スコア表示が "3" になっている
+
+  - name: タイマー終了
+    steps:
+      - 円を 1 回タップ（タイマー開始）
+      - 10 秒待つ
+    expect:
+      - "Game Over" モーダルが表示される
+      - 最終スコアがスコア表示と一致
+
+  - name: 再スタート
+    steps:
+      - Game Over モーダルで "Restart" を押す
+    expect:
+      - スコア表示が "0" にリセット
+      - 円要素が再びタップ可能になっている

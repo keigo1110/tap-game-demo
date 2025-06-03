@@ -1,0 +1,31 @@
+id: 20250605-tapgame2
+title: Simple Tap Game - Two Players
+labels:
+  - auto-dev
+  - multiplayer
+acceptance_criteria:
+  - 画面の左右に青い円（Player1用）と赤い円（Player2用）が表示される
+  - 各プレイヤーのスコア表示が独立して表示される（Player1: 左側、Player2: 右側）
+  - どちらかのプレイヤーが最初にタップすると10秒のカウントダウンが開始される
+  - 各円をタップするとそれぞれのプレイヤーのスコアが +1 される
+  - 10秒経過すると「Game Over」モーダルが表示され、勝者とスコアが表示される
+  - 同点の場合は「Draw」と表示される
+  - 「Play Again」ボタンを押すと両プレイヤーのスコアが0、タイマー未開始状態に戻る
+  - ゲーム中は両方の円がタップ可能で、独立してスコアが増加する
+constraints:
+  max_loc_change: 300   # 2プレイヤー版は300行以内に制限
+
+# プレイヤー設定
+players:
+  player1:
+    position: left
+    color: "#4169E1"  # 青
+    name: "Player 1"
+  player2:
+    position: right
+    color: "#DC143C"  # 赤
+    name: "Player 2"
+
+# CI で使う Node バージョン
+test_matrix:
+  node: ["20"]

@@ -21,12 +21,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
 
       - name: Install dependencies
         run: |
-          if [ -f package.json ]; then
-            npm ci || npm install
+          if [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f package.json ]; then
+            npm install
+          else
+            echo "No package.json found, skipping dependency installation"
           fi
 
       - name: Validate HTML structure
@@ -63,6 +66,35 @@ jobs:
             exit 1
           fi
           echo "✅ Game Over modal found"
+
+          # Check two-player version if it exists
+          if [ -f index2.html ]; then
+            echo "🎮 Checking two-player version..."
+
+            if ! grep -q 'id="score1"' index2.html; then
+              echo "Error: Player 1 score element not found in two-player version"
+              exit 1
+            fi
+            echo "✅ Player 1 score element found"
+
+            if ! grep -q 'id="score2"' index2.html; then
+              echo "Error: Player 2 score element not found in two-player version"
+              exit 1
+            fi
+            echo "✅ Player 2 score element found"
+
+            if ! grep -q 'id="circle1"' index2.html; then
+              echo "Error: Player 1 circle not found in two-player version"
+              exit 1
+            fi
+            echo "✅ Player 1 circle found"
+
+            if ! grep -q 'id="circle2"' index2.html; then
+              echo "Error: Player 2 circle not found in two-player version"
+              exit 1
+            fi
+            echo "✅ Player 2 circle found"
+          fi
 
       - name: Validate JavaScript syntax
         run: |
@@ -103,12 +135,23 @@ jobs:
       - name: Check line count constraint
         run: |
           line_count=$(wc -l < index.html)
-          echo "Current line count: $line_count"
+          echo "Single player version line count: $line_count"
           if [ $line_count -gt 200 ]; then
-            echo "❌ Error: File exceeds 200 line limit (current: $line_count)"
+            echo "❌ Error: Single player file exceeds 200 line limit (current: $line_count)"
             exit 1
           fi
-          echo "✅ Line count constraint satisfied ($line_count/200)"
+          echo "✅ Single player line count constraint satisfied ($line_count/200)"
+
+          # Check two-player version if it exists
+          if [ -f index2.html ]; then
+            line_count2=$(wc -l < index2.html)
+            echo "Two player version line count: $line_count2"
+            if [ $line_count2 -gt 300 ]; then
+              echo "❌ Error: Two player file exceeds 300 line limit (current: $line_count2)"
+              exit 1
+            fi
+            echo "✅ Two player line count constraint satisfied ($line_count2/300)"
+          fi
 
       - name: Validate CSS structure
         run: |
@@ -129,6 +172,21 @@ jobs:
             exit 1
           fi
           echo "✅ Blue circle background color found"
+
+          # Check two-player version colors if it exists
+          if [ -f index2.html ]; then
+            if ! grep -q "#4169E1\|#4169e1" index2.html; then
+              echo "❌ Error: Blue player color not found in two-player version"
+              exit 1
+            fi
+            echo "✅ Blue player color found in two-player version"
+
+            if ! grep -q "#DC143C\|#dc143c" index2.html; then
+              echo "❌ Error: Red player color not found in two-player version"
+              exit 1
+            fi
+            echo "✅ Red player color found in two-player version"
+          fi
 
       - name: Test game functionality (basic checks)
         run: |
@@ -156,6 +214,39 @@ jobs:
               process.exit(1);
             }
             console.log('✅ Restart button found');
+
+            // Check two-player version if it exists
+            if (require('fs').existsSync('index2.html')) {
+              const html2 = require('fs').readFileSync('index2.html', 'utf8');
+
+              // Check for Player 1 Wins message
+              if (!html2.includes('Player 1 Wins!')) {
+                console.error('❌ Player 1 Wins message not found in two-player version');
+                process.exit(1);
+              }
+              console.log('✅ Player 1 Wins message found');
+
+              // Check for Player 2 Wins message
+              if (!html2.includes('Player 2 Wins!')) {
+                console.error('❌ Player 2 Wins message not found in two-player version');
+                process.exit(1);
+              }
+              console.log('✅ Player 2 Wins message found');
+
+              // Check for Draw message
+              if (!html2.includes('Draw!')) {
+                console.error('❌ Draw message not found in two-player version');
+                process.exit(1);
+              }
+              console.log('✅ Draw message found');
+
+              // Check for Play Again button
+              if (!html2.includes('Play Again')) {
+                console.error('❌ Play Again button not found in two-player version');
+                process.exit(1);
+              }
+              console.log('✅ Play Again button found');
+            }
           "
 
       - name: Generate test report
@@ -171,8 +262,12 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📊 Project Stats" >> $GITHUB_STEP_SUMMARY
           echo "- Node.js version: ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Total lines: $(wc -l < index.html)" >> $GITHUB_STEP_SUMMARY
-          echo "- File size: $(du -h index.html | cut -f1)B" >> $GITHUB_STEP_SUMMARY
+          echo "- Single player lines: $(wc -l < index.html)" >> $GITHUB_STEP_SUMMARY
+          echo "- Single player file size: $(du -h index.html | cut -f1)B" >> $GITHUB_STEP_SUMMARY
+          if [ -f index2.html ]; then
+            echo "- Two player lines: $(wc -l < index2.html)" >> $GITHUB_STEP_SUMMARY
+            echo "- Two player file size: $(du -h index2.html | cut -f1)B" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🚀 Ready for deployment!"
 
@@ -198,6 +293,20 @@ jobs:
             fi
           done
           echo "✅ All required files present"
+
+          # Check optional two-player files
+          if [ -f index2.html ]; then
+            echo "✅ Two-player version found"
+            if [ -f README2.md ]; then
+              echo "✅ Two-player documentation found"
+            fi
+            if [ -f requirements/tap_game2.yaml ]; then
+              echo "✅ Two-player requirements found"
+            fi
+            if [ -f test_spec/tap_game_test2.yaml ]; then
+              echo "✅ Two-player test specs found"
+            fi
+          fi
 
           # Verify HTML can be served statically
           if grep -q "<!DOCTYPE html>" index.html && grep -q "</html>" index.html; then

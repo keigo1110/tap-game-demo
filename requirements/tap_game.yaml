@@ -1,0 +1,16 @@
+id: 20250605-tapgame
+title: Simple Tap Game
+labels:
+  - auto-dev
+acceptance_criteria:
+  - 画面中央に青い円（タップ対象）が表示される
+  - 円をタップするとスコアが +1 され、スコア表示が更新される
+  - 最初のタップと同時に 10 秒のカウントダウンが開始
+  - 10 秒経過するとモーダル "Game Over" が出て最終スコアを表示
+  - 「Restart」ボタンを押すとスコア 0、タイマー未開始状態に戻る
+constraints:
+  max_loc_change: 200   # 1 周の実装を 200 行以内に制限
+
+# CI で使う Node バージョン
+test_matrix:
+  node: ["20"]
